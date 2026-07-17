@@ -56,10 +56,39 @@ export default function App() {
     };
   }, [go, toggleFs, slides.length]);
 
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    if (isLeftSwipe) {
+      go(1);
+    } else if (isRightSwipe) {
+      go(-1);
+    }
+  };
+
   const Current = slides[i].component;
 
   return (
-    <main className="stage relative flex h-screen w-screen flex-col overflow-hidden">
+    <main
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className="stage relative flex h-dvh w-screen flex-col overflow-hidden"
+    >
       <header className="relative z-20 flex items-center justify-between px-4 py-4 md:px-12 md:py-6">
         <div className="flex items-center gap-3 min-w-0">
           <MarcaDourada />
